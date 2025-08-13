@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>stock scan</title>
+    <link rel="stylesheet" href="/src/style.css">
+    <link rel="stylesheet" href="/src/modal.css">
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1>stock scan</h1>
+        </header>
+
+        <main class="grid-container">
+            <div class="grid-item entry" id="entryBtn">
+                <span>➕</span>
+                <span>ENTRÉE</span>
+            </div>
+            <div class="grid-item exit" id="exitBtn">
+                <span>➖</span>
+                <span>SORTIE</span>
+            </div>
+            <div class="grid-item" id="inventoryBtn">
+                <span>📋</span>
+                <span>INVENTAIRE</span>
+            </div>
+            <div class="grid-item" id="viewBtn">
+                <span>👁️</span>
+                <span>VOIR</span>
+            </div>
+            <div class="grid-item" id="cartBtn">
+                <span>🛒</span>
+                <span>PANIER</span>
+            </div>
+            <div class="grid-item" id="moveBtn">
+                <span>🔄</span>
+                <span>DÉPLACER</span>
+            </div>
+            <div class="grid-item" id="exportBtn">
+                <span>📤</span>
+                <span>EXPORTER</span>
+            </div>
+            <div class="grid-item" id="deleteBtn">
+                <span>🗑️</span>
+                <span>SUPPRIMER</span>
+            </div>
+        </main>
+
+        <!-- Modales -->
+        <!-- Modal Entrée -->
+        <div id="entryModal" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Entrée de stock</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="entryForm">
+                        <div class="form-group">
+                            <label>Référence ou Code-barres</label>
+                            <div class="scan-input">
+                                <input type="text" id="entryReference" required>
+                                <button type="button" class="scan-button" data-target="entryReference">📷</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Désignation</label>
+                            <input type="text" id="entryDesignation" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Quantité</label>
+                            <input type="number" id="entryQuantity" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Fournisseur</label>
+                            <input type="text" id="entrySupplier">
+                        </div>
+                        <div class="form-group">
+                            <label>Emplacement</label>
+                            <input type="text" id="entryLocation" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Note</label>
+                            <textarea id="entryNote"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel">Annuler</button>
+                    <button class="confirm" form="entryForm">Valider</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Sortie -->
+        <div id="exitModal" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Sortie de stock</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="exitForm">
+                        <div class="form-group">
+                            <label>Référence ou Code-barres</label>
+                            <div class="scan-input">
+                                <input type="text" id="exitReference" required>
+                                <button type="button" class="scan-button" data-target="exitReference">📷</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Désignation</label>
+                            <input type="text" id="exitDesignation" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock disponible</label>
+                            <input type="number" id="exitCurrentStock" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Quantité à sortir</label>
+                            <input type="number" id="exitQuantity" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Motif</label>
+                            <select id="exitReason" required>
+                                <option value="vente">Vente</option>
+                                <option value="transfert">Transfert</option>
+                                <option value="perte">Perte/Casse</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Note</label>
+                            <textarea id="exitNote"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel">Annuler</button>
+                    <button class="confirm" form="exitForm">Valider</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Inventaire -->
+        <div id="inventoryModal" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Inventaire</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="inventory-actions">
+                        <button id="startInventory">Nouveau</button>
+                        <button id="continueInventory">Reprendre</button>
+                    </div>
+                    <div class="inventory-scan hidden">
+                        <div class="form-group">
+                            <label>Scanner un article</label>
+                            <div class="scan-input">
+                                <input type="text" id="inventoryReference">
+                                <button type="button" class="scan-button" data-target="inventoryReference">📷</button>
+                            </div>
+                        </div>
+                        <div class="inventory-details hidden">
+                            <div class="form-group">
+                                <label>Désignation</label>
+                                <input type="text" id="inventoryDesignation" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Stock théorique</label>
+                                <input type="number" id="inventoryTheoretical" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Stock réel</label>
+                                <input type="number" id="inventoryReal" required min="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="inventory-progress hidden">
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 0%"></div>
+                        </div>
+                        <p class="progress-text">0%</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel">Fermer</button>
+                    <button class="confirm hidden">Valider l'inventaire</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Consultation -->
+        <div id="viewModal" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Consultation stock</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="search-filters">
+                        <div class="form-group">
+                            <input type="text" id="searchArticle" placeholder="Rechercher...">
+                        </div>
+                        <div class="form-group">
+                            <select id="filterFamily">
+                                <option value="">Toutes les familles</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select id="filterLocation">
+                                <option value="">Tous les emplacements</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="articles-list">
+                        <!-- Liste des articles -->
+                    </div>
+                    <div class="article-details hidden">
+                        <!-- Détails d'un article -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Export -->
+        <div id="exportModal" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Exporter les données</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Type d'export</label>
+                        <select id="exportType">
+                            <option value="stock">État du stock</option>
+                            <option value="movements">Mouvements</option>
+                            <option value="inventory">Dernier inventaire</option>
+                        </select>
+                    </div>
+                    <div class="form-group date-range hidden">
+                        <label>Période</label>
+                        <input type="date" id="exportStartDate">
+                        <input type="date" id="exportEndDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Format</label>
+                        <select id="exportFormat">
+                            <option value="csv">CSV</option>
+                            <option value="excel">Excel</option>
+                            <option value="pdf">PDF</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel">Annuler</button>
+                    <button class="confirm">Exporter</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>scan stock v1.5</p>
+        </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
+
+            <div id="entryView" class="view hidden">
+                <h2>Entrée de stock</h2>
+                <form id="entryForm">
+                    <div class="form-group">
+                        <label for="productEntry">Produit (scan ou recherche)</label>
+                        <div class="scan-input">
+                            <input type="text" id="productEntry" required>
+                            <button type="button" class="scan-btn">📷</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantityEntry">Quantité</label>
+                        <input type="number" id="quantityEntry" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="noteEntry">Note (optionnel)</label>
+                        <textarea id="noteEntry"></textarea>
+                    </div>
+                    <button type="submit">Valider l'entrée</button>
+                </form>
+            </div>
+
+            <div id="exitView" class="view hidden">
+                <h2>Sortie de stock</h2>
+                <form id="exitForm">
+                    <div class="form-group">
+                        <label for="productExit">Produit (scan ou recherche)</label>
+                        <div class="scan-input">
+                            <input type="text" id="productExit" required>
+                            <button type="button" class="scan-btn">📷</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantityExit">Quantité</label>
+                        <input type="number" id="quantityExit" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="noteExit">Note (optionnel)</label>
+                        <textarea id="noteExit"></textarea>
+                    </div>
+                    <button type="submit">Valider la sortie</button>
+                </form>
+            </div>
+
+            <div id="journalView" class="view hidden">
+                <h2>Journal des mouvements</h2>
+                <div class="filters">
+                    <input type="date" id="startDate">
+                    <input type="date" id="endDate">
+                    <select id="movementType">
+                        <option value="">Tous les types</option>
+                        <option value="entry">Entrées</option>
+                        <option value="exit">Sorties</option>
+                    </select>
+                </div>
+                <div id="movementsList"></div>
+            </div>
+        </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>l>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
